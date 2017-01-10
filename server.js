@@ -11,9 +11,17 @@ var sessionMongo = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(sessionMongo);
 
 var app = express();
+console.log('NODE_ENV: ' + process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development') {
+	console.log('Using dotenv');
 	require('dotenv').load();
 }
+
+console.log('.env');
+console.log(process.env.YELP_KEY);
+console.log(process.env.YELP_SECRET);
+console.log(process.env.YELP_TOKEN);
+console.log(process.env.YELP_TOKEN_SECRET);
 
 require('./app/config/passport')(passport);
 

@@ -1,7 +1,7 @@
 'use strict'
 var React = require('react');
 var ReactDOM = require('react-dom');
-
+ 
 function getQueryVariable(variable) {
     var query = window.location.search.substring(1);
     var vars = query.split('&');
@@ -12,50 +12,6 @@ function getQueryVariable(variable) {
         }
     }
     // console.log('Query variable %s not found', variable);
-}
-
-function getData(data){
-  var id,url,method,type,route;
-  // console.log('url');
-  // console.log(data);
-  var arr = data.split('/');
-  // console.log(arr);
-  if (arr[2] === 'poll') {
-    // console.log('poll');
-    id = arr[3];
-    url = '/api/poll/' + id;
-    route = url;
-    method = 'GET';
-    type = 'poll';
-  } else if (arr[2] === 'allPolls') {
-    // console.log('allPolls');
-    id = 'none'
-    url = '/api/allPolls';
-    method = 'GET';
-    type = 'all'
-    route = '/'
-  } else {
-    id = arr[2];
-    url = '/api/:id/profile';
-    route = '/profile/' + id;
-    method = 'GET';
-    type = 'profile';
-  }
-
-  // console.log('navlink all data');
-  // console.log(id);
-  // console.log(url);
-  // console.log(route);
-  // console.log(method);
-  // console.log(type);
-
-  $.ajax({
-    url : url,
-    method: method
-  })
-  .then(res => {
-    this.props.cb(route, type, res);
-  });
 }
 
 function getColors(num){
@@ -80,30 +36,34 @@ class Main extends React.Component {
     super(props);
     // console.log('Main init');
     this.callBack = this.callBack.bind(this);
-    this.state = {message : ''};
+    this.getData = this.getData.bind(this);
+    this.state = {message : '', results: {}};
   }
-  callBack(path, type, data){
-    // console.log('Main callBack called');
-    // console.log('path ' + path);
-    // console.log('type ' + type);
-    // console.log('data: ');
-    // console.log(data);
-    switch (type) {
-      case 'get':
-      // console.log('cb get');
-        break;
-      case 'put':
-        // console.log('cb put');
-        break;
-      case 'post':
-        // console.log('cb post');
-        break;
-      case 'delete':
-        // console.log('cb delete');
-        break;
-      default:
-        // console.log('cb default');
-    }
+  callBack(url, method, address){
+    console.log('Main callBack called');
+    console.log('url ' + url);
+    console.log('method ' + method);
+    console.log('search: ');
+    console.log(address);
+    var appUrl = window.location.origin + url;
+    var search = { address : address};
+    var data = {url : appUrl, method: method, search : search};
+    this.getData(data);
+  }
+  getData(data){
+    console.log('getData data');
+    console.log(data);
+    $.ajax({
+      url : data.url,
+      method: data.method,
+      data: JSON.stringify(data.search),
+      contentType: "application/json",
+      dataType: 'json'
+    }).then(results => {
+      console.log('submitted done');
+      console.log(results);
+      // this.setState({poll : data, message : 'results'})
+    });
   }
   componentDidMount(){
     // console.log('Main componentDidMount');
@@ -124,10 +84,48 @@ class Main extends React.Component {
     return(
       <div>
         <h1>React Template Test</h1>
+        <Search cb={this.callBack}></Search>
       </div>
     )
   }
 }
+
+const Search = React.createClass({
+  handler(e){
+    e.preventDefault();
+    console.log('Search Handler');
+    console.log(this.refs.input.value);
+    this.props.cb('/api/search', 'POST', this.refs.input.value)
+  },
+  render(){
+    console.log('Search');
+    console.log(this.props);
+    return (
+      <form id='search'>
+        <label>Enter an Address</label>
+      <input type='text' ref='input' id='input'></input>
+        <button onClick={this.handler}>Enter</button>
+      </form>
+    )
+  }
+});
+
+const Tweet = React.createClass({
+  componentDidMount(){
+    // console.log(this.props.poll);
+    var id = this.props.poll._id;
+    var name = 'New Poll: ' + this.props.poll.name;
+    var url = window.location.href + '?poll=' + id;
+    var elem = document.getElementById('twit-share');
+    var data = {};
+    data.text = name;
+    data.size = 'large';
+    twttr.widgets.createShareButton(url, elem, data);
+  },
+  render(){
+    return <a id='twit-share'></a>
+  }
+});
 
 ReactDOM.render(
   <Main />,

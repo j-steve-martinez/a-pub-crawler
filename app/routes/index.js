@@ -2,10 +2,10 @@
 
 var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
+var YelpServer = require(path + '/app/controllers/yelp.server.js');
 var index = path + '/public/index.html';
 
-module.exports = function (app, passport) {
-
+module.exports = function (app, passport, configYelp) {
 	function isLoggedIn (req, res, next) {
 		console.log('starting isAuthenticated');
 		if (req.isAuthenticated()) {
@@ -19,6 +19,7 @@ module.exports = function (app, passport) {
 	}
 
 	var clickHandler = new ClickHandler();
+	var yelpServer = new YelpServer();
 	clickHandler.addDefault();
 
 	app.route('/')
@@ -32,6 +33,12 @@ module.exports = function (app, passport) {
 			req.logout();
 			res.redirect('/');
 		});
+
+	app.route('/api/search')
+		.post(yelpServer.search);
+		// .get(function(req, res){
+		// 	res.json({test : true});
+		// });
 
 	// get user info
 	app.route('/api/:id')

@@ -8,6 +8,6 @@
   "createTranspiledCode":             true,
   "disableWhenNoBabelrcFileInPath":   true,
   "suppressSourcePathMessages":       false,
-  "suppressTranspileOnSaveMessages":  false,
+  "suppressTranspileOnSaveMessages":  true,
   "transpileOnSave":                  true
 }

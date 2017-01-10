@@ -69,51 +69,6 @@
 	  // console.log('Query variable %s not found', variable);
 	}
 
-	function getData(data) {
-	  var _this = this;
-
-	  var id, url, method, type, route;
-	  // console.log('url');
-	  // console.log(data);
-	  var arr = data.split('/');
-	  // console.log(arr);
-	  if (arr[2] === 'poll') {
-	    // console.log('poll');
-	    id = arr[3];
-	    url = '/api/poll/' + id;
-	    route = url;
-	    method = 'GET';
-	    type = 'poll';
-	  } else if (arr[2] === 'allPolls') {
-	    // console.log('allPolls');
-	    id = 'none';
-	    url = '/api/allPolls';
-	    method = 'GET';
-	    type = 'all';
-	    route = '/';
-	  } else {
-	    id = arr[2];
-	    url = '/api/:id/profile';
-	    route = '/profile/' + id;
-	    method = 'GET';
-	    type = 'profile';
-	  }
-
-	  // console.log('navlink all data');
-	  // console.log(id);
-	  // console.log(url);
-	  // console.log(route);
-	  // console.log(method);
-	  // console.log(type);
-
-	  $.ajax({
-	    url: url,
-	    method: method
-	  }).then(function (res) {
-	    _this.props.cb(route, type, res);
-	  });
-	}
-
 	function getColors(num) {
 	  // console.log('getting colors');
 	  var data = { c: [], bg: [] };
@@ -138,37 +93,43 @@
 	    _classCallCheck(this, Main);
 
 	    // console.log('Main init');
-	    var _this2 = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
 
-	    _this2.callBack = _this2.callBack.bind(_this2);
-	    _this2.state = { message: '' };
-	    return _this2;
+	    _this.callBack = _this.callBack.bind(_this);
+	    _this.getData = _this.getData.bind(_this);
+	    _this.state = { message: '', results: {} };
+	    return _this;
 	  }
 
 	  _createClass(Main, [{
 	    key: 'callBack',
-	    value: function callBack(path, type, data) {
-	      // console.log('Main callBack called');
-	      // console.log('path ' + path);
-	      // console.log('type ' + type);
-	      // console.log('data: ');
-	      // console.log(data);
-	      switch (type) {
-	        case 'get':
-	          // console.log('cb get');
-	          break;
-	        case 'put':
-	          // console.log('cb put');
-	          break;
-	        case 'post':
-	          // console.log('cb post');
-	          break;
-	        case 'delete':
-	          // console.log('cb delete');
-	          break;
-	        default:
-	        // console.log('cb default');
-	      }
+	    value: function callBack(url, method, address) {
+	      console.log('Main callBack called');
+	      console.log('url ' + url);
+	      console.log('method ' + method);
+	      console.log('search: ');
+	      console.log(address);
+	      var appUrl = window.location.origin + url;
+	      var search = { address: address };
+	      var data = { url: appUrl, method: method, search: search };
+	      this.getData(data);
+	    }
+	  }, {
+	    key: 'getData',
+	    value: function getData(data) {
+	      console.log('getData data');
+	      console.log(data);
+	      $.ajax({
+	        url: data.url,
+	        method: data.method,
+	        data: JSON.stringify(data.search),
+	        contentType: "application/json",
+	        dataType: 'json'
+	      }).then(function (results) {
+	        console.log('submitted done');
+	        console.log(results);
+	        // this.setState({poll : data, message : 'results'})
+	      });
 	    }
 	  }, {
 	    key: 'componentDidMount',
@@ -178,7 +139,7 @@
 	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      var _this3 = this;
+	      var _this2 = this;
 
 	      // console.log('Main componentWillMount');
 	      var apiUrl = window.location.origin + '/api/:id';
@@ -186,7 +147,7 @@
 	        url: apiUrl,
 	        method: 'GET'
 	      }).then(function (auth) {
-	        _this3.setState({ auth: auth });
+	        _this2.setState({ auth: auth });
 	      });
 	    }
 	  }, {
@@ -201,13 +162,61 @@
 	          'h1',
 	          null,
 	          'React Template Test'
-	        )
+	        ),
+	        React.createElement(Search, { cb: this.callBack })
 	      );
 	    }
 	  }]);
 
 	  return Main;
 	}(React.Component);
+
+	var Search = React.createClass({
+	  displayName: 'Search',
+	  handler: function handler(e) {
+	    e.preventDefault();
+	    console.log('Search Handler');
+	    console.log(this.refs.input.value);
+	    this.props.cb('/api/search', 'POST', this.refs.input.value);
+	  },
+	  render: function render() {
+	    console.log('Search');
+	    console.log(this.props);
+	    return React.createElement(
+	      'form',
+	      { id: 'search' },
+	      React.createElement(
+	        'label',
+	        null,
+	        'Enter an Address'
+	      ),
+	      React.createElement('input', { type: 'text', ref: 'input', id: 'input' }),
+	      React.createElement(
+	        'button',
+	        { onClick: this.handler },
+	        'Enter'
+	      )
+	    );
+	  }
+	});
+
+	var Tweet = React.createClass({
+	  displayName: 'Tweet',
+	  componentDidMount: function componentDidMount() {
+	    // console.log(this.props.poll);
+	    var id = this.props.poll._id;
+	    var name = 'New Poll: ' + this.props.poll.name;
+	    var url = window.location.href + '?poll=' + id;
+	    var elem = document.getElementById('twit-share');
+	    var data = {};
+	    data.text = name;
+	    data.size = 'large';
+	    twttr.widgets.createShareButton(url, elem, data);
+	  },
+	  render: function render() {
+	    return React.createElement('a', { id: 'twit-share' });
+	  }
+	});
 
 	ReactDOM.render(React.createElement(Main, null), document.getElementById('content'));
 

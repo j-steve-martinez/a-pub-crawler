@@ -36,11 +36,13 @@
     "express-session": "^1.11.3",
     "if-env": "1.0.0",
     "mongoose": "^4.1.0",
+    "node-sass": "4.1.1",
     "passport": "^0.3.0",
     "passport-github": "^1.0.0",
     "passport-twitter": "1.0.4",
     "react": "15.4.1",
-    "react-dom": "15.4.1"
+    "react-dom": "15.4.1",
+    "yelp": "1.0.2"
   },
   "devDependencies": {
     "babel-core": "6.21.0",
