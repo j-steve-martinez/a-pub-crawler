@@ -25,10 +25,11 @@ function YelpServer(){
       // console.log('yelp obj');
       // console.log(yelp);
       // res.json({success : data})
-      yelp.search({ term: 'bar', location: data.address })
+      yelp.search({ term: 'bar alcohol', location: data.address })
         .then(function (data) {
           console.log(data);
-          res.json({success : data});
+          res.send(data);
+          // res.json(data);
         })
         .catch(function (err) {
           console.error(err);

@@ -48,6 +48,8 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -56,6 +58,11 @@
 
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(32);
+	// var ReactBootstrap = require('react-bootstrap');
+	// var Nav = ReactBootstrap.Nav;
+	// var NavItem = ReactBootstrap.NavItem;
+	// var NavDropdown = ReactBootstrap.NavDropdown;
+	// var MenuItem = ReactBootstrap.MenuItem;
 
 	function getQueryVariable(variable) {
 	  var query = window.location.search.substring(1);
@@ -117,6 +124,8 @@
 	  }, {
 	    key: 'getData',
 	    value: function getData(data) {
+	      var _this2 = this;
+
 	      console.log('getData data');
 	      console.log(data);
 	      $.ajax({
@@ -128,7 +137,7 @@
 	      }).then(function (results) {
 	        console.log('submitted done');
 	        console.log(results);
-	        // this.setState({poll : data, message : 'results'})
+	        _this2.setState({ results: results, message: 'results' });
 	      });
 	    }
 	  }, {
@@ -139,7 +148,7 @@
 	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      // console.log('Main componentWillMount');
 	      var apiUrl = window.location.origin + '/api/:id';
@@ -147,7 +156,7 @@
 	        url: apiUrl,
 	        method: 'GET'
 	      }).then(function (auth) {
-	        _this2.setState({ auth: auth });
+	        _this3.setState({ auth: auth });
 	      });
 	    }
 	  }, {
@@ -155,15 +164,16 @@
 	    value: function render() {
 	      console.log('Main this.state');
 	      console.log(this.state);
+	      console.log('message');
+	      console.log(this.state.message);
+	      var results;
+	      this.state.message === '' ? results = null : results = React.createElement(List, { cb: this.callBack, data: this.state.results });
 	      return React.createElement(
 	        'div',
 	        null,
-	        React.createElement(
-	          'h1',
-	          null,
-	          'React Template Test'
-	        ),
-	        React.createElement(Search, { cb: this.callBack })
+	        React.createElement(Header, null),
+	        React.createElement(Search, { cb: this.callBack }),
+	        results
 	      );
 	    }
 	  }]);
@@ -183,18 +193,106 @@
 	    console.log('Search');
 	    console.log(this.props);
 	    return React.createElement(
-	      'form',
-	      { id: 'search' },
+	      'div',
+	      null,
 	      React.createElement(
-	        'label',
-	        null,
-	        'Enter an Address'
-	      ),
-	      React.createElement('input', { type: 'text', ref: 'input', id: 'input' }),
+	        'nav',
+	        { className: 'navbar navbar-default' },
+	        React.createElement(
+	          'div',
+	          { className: 'container-fluid' },
+	          React.createElement(
+	            'div',
+	            { className: 'navbar-header' },
+	            React.createElement(
+	              'div',
+	              { className: 'navbar-brand' },
+	              React.createElement(
+	                'span',
+	                null,
+	                'Pub Crawler'
+	              )
+	            )
+	          ),
+	          React.createElement(
+	            'form',
+	            { id: 'search', className: 'navbar-form navbar-left', role: 'search' },
+	            React.createElement(
+	              'div',
+	              { className: 'form-group' },
+	              React.createElement('input', { type: 'text', ref: 'input', className: 'form-control', placeholder: 'Enter an Address' })
+	            ),
+	            React.createElement(
+	              'button',
+	              { onClick: this.handler, type: 'submit', className: 'btn btn-warning' },
+	              'Search'
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+	var List = React.createClass({
+	  displayName: 'List',
+	  render: function render() {
+	    console.log('List');
+	    // console.log(this.state);
+	    console.log(this.props);
+	    // TODO: replace mock data
+	    var count = 0;
+	    // create a list of bar links
+	    var pubs = this.props.data.businesses.map(function (value, key, arr) {
+	      var item = React.createElement(
+	        'a',
+	        { href: '#', className: 'list-group-item', key: key },
+	        React.createElement('img', { className: 'image', src: value.image_url }),
+	        React.createElement(
+	          'span',
+	          _defineProperty({ className: 'badge' }, 'className', 'badge'),
+	          'Attending ',
+	          count
+	        ),
+	        React.createElement(
+	          'span',
+	          { className: 'title' },
+	          ' ',
+	          value.name,
+	          ' '
+	        ),
+	        React.createElement(
+	          'div',
+	          { className: 'description' },
+	          ' ',
+	          value.snippet_text,
+	          ' '
+	        )
+	      );
+	      return item;
+	    });
+
+	    return React.createElement(
+	      'div',
+	      { className: 'list-group' },
+	      pubs
+	    );
+	  }
+	});
+
+	var Btn = React.createClass({
+	  displayName: 'Btn',
+	  render: function render() {
+	    // mock props
+	    var count = 1;
+	    return React.createElement(
+	      'a',
+	      { href: '#' },
 	      React.createElement(
 	        'button',
-	        { onClick: this.handler },
-	        'Enter'
+	        { className: 'btn btn-success btn-sm' },
+	        count,
+	        ' RSVP'
 	      )
 	    );
 	  }
@@ -215,6 +313,31 @@
 	  },
 	  render: function render() {
 	    return React.createElement('a', { id: 'twit-share' });
+	  }
+	});
+
+	var Header = React.createClass({
+	  displayName: 'Header',
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'header' },
+	      React.createElement(
+	        'div',
+	        { id: 'image' },
+	        React.createElement('img', { id: 'beer', src: '/public/img/beer.png' })
+	      ),
+	      React.createElement(
+	        'h1',
+	        null,
+	        'Looking for Somewhere to go tonight?'
+	      ),
+	      React.createElement(
+	        'h4',
+	        null,
+	        'Search the bar scene and RSVP'
+	      )
+	    );
 	  }
 	});
 

@@ -1,70 +1,84 @@
-// $bgDefault      : #5eb833;
-$bgDefault      : #337AB7;
-// $bgHighlight    : #5eda23;
-$bgHighlight    : #62aded;
-$colDefault     : #fcf8e3;
-$colHighlight   : #4e4a36;
-// #D9EDF7
+$bgDefault      : #f3f5a2;
+$bgHighlight    : #f4f6c1;
+$bgFocus        : #f1f2d2;
+$colDefault     : #ed6b0e;
+$colHighlight   : #9e653c;
+
+@mixin colors($color, $background) {
+    color: $color;
+    background-color: $background;
+}
+@mixin margin-auto {
+    margin: 5px auto;
+}
+
 body {
-  background-color: #f6f6f0;
+  font-family: Tahoma, sans-serif;
+  @include colors($colDefault, $bgHighlight);
 }
 
-textarea {
-  width: 200px;
-	height: 120px;
-	border: 3px solid #cccccc;
-  background-color: #d9edf7;
-	padding: 5px;
-	font-family: Tahoma, sans-serif;
-}
-
-.jumbotron {
-  background-color: #d9edf7;
-  margin-bottom: 20px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+footer {
   text-align: center;
+  padding-bottom: 25px;
+}
+
+a.list-group-item {
+  @include colors($colHighlight, $bgDefault);
+  // @include colors($colHighlight, $bgHighlight);
+}
+
+a.list-group-item:hover{
+  @include colors($colHighlight, $bgHighlight);
+}
+
+a.list-group-item:focus {
+  @include colors($colDefault, $bgFocus);
+}
+
+.form-control {
+  @include colors($colHighlight, $bgFocus);
+  border-color: $bgFocus;
+}
+.form-control:focus {
+  border-color: #FF0000;
+  box-shadow: inset 0 1px 1px $colHighlight, 0 0 4px $colDefault;
+}
+#image {
+  float:left;
+}
+
+#beer {
+  width: 75px;
 }
 
 .badge {
-  margin-left: 10px;
+  @include colors(#f2f0bd, #427d50);
 }
 
-.about, #credits {
-  padding: 10px;
-  border-radius: 6pt;
+.button {
+  padding-left: 1px;
 }
 
-#credits {
-  background-color: #D9EDF7;
+.image {
+  width: 50px;
+  padding-right: 3px;
 }
 
-#warning {
-  color: #e81616;
-}
+.title {
 
-.link {
-  color: #337AB7;
-}
-
-.credit {
-  display: inline-block;
+  padding-left: 5px;
   padding-right: 5px;
-  text-align: right;
-  width: 85px;
 }
 
-.panel {
-  text-align: center;
+.description {
+
+  padding-left: 5px;
+  padding-right: 15px;
+  height:inherit;
 }
 
-.user {
-  background-color: #3a6386;
-  padding: 3px;
-  border-radius: 6px;
-}
-.container-fluid {
-  margin-bottom: 5px;
+.header {
+  @include margin-auto;
 }
 
 .navbar-default {

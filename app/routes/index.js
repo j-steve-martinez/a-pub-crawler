@@ -35,7 +35,8 @@ module.exports = function (app, passport, configYelp) {
 		});
 
 	app.route('/api/search')
-		.post(yelpServer.search);
+		.post(yelpServer.search)
+		// .get(yelpServer.search);
 		// .get(function(req, res){
 		// 	res.json({test : true});
 		// });

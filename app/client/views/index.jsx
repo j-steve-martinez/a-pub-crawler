@@ -1,7 +1,12 @@
 'use strict'
 var React = require('react');
 var ReactDOM = require('react-dom');
- 
+// var ReactBootstrap = require('react-bootstrap');
+// var Nav = ReactBootstrap.Nav;
+// var NavItem = ReactBootstrap.NavItem;
+// var NavDropdown = ReactBootstrap.NavDropdown;
+// var MenuItem = ReactBootstrap.MenuItem;
+
 function getQueryVariable(variable) {
     var query = window.location.search.substring(1);
     var vars = query.split('&');
@@ -62,7 +67,7 @@ class Main extends React.Component {
     }).then(results => {
       console.log('submitted done');
       console.log(results);
-      // this.setState({poll : data, message : 'results'})
+      this.setState({results : results, message : 'results'})
     });
   }
   componentDidMount(){
@@ -79,12 +84,19 @@ class Main extends React.Component {
     })
   }
   render(){
-  console.log('Main this.state');
-  console.log(this.state);
+    console.log('Main this.state');
+    console.log(this.state);
+    console.log('message');
+    console.log(this.state.message);
+    var results;
+    this.state.message === '' ?
+      results = null :
+      results = <List cb={this.callBack} data={this.state.results}/>;
     return(
       <div>
-        <h1>React Template Test</h1>
+        <Header />
         <Search cb={this.callBack}></Search>
+        {results}
       </div>
     )
   }
@@ -101,14 +113,66 @@ const Search = React.createClass({
     console.log('Search');
     console.log(this.props);
     return (
-      <form id='search'>
-        <label>Enter an Address</label>
-      <input type='text' ref='input' id='input'></input>
-        <button onClick={this.handler}>Enter</button>
-      </form>
+      <div>
+        <nav className="navbar navbar-default">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <div className="navbar-brand">
+                <span>Pub Crawler</span>
+              </div>
+            </div>
+            <form id='search' className="navbar-form navbar-left" role="search">
+              <div className="form-group">
+                <input type='text' ref='input' className="form-control" placeholder="Enter an Address"></input>
+              </div>
+              <button onClick={this.handler} type="submit" className="btn btn-warning">Search</button>
+            </form>
+          </div>
+        </nav>
+      </div>
     )
   }
 });
+
+const List = React.createClass({
+  render(){
+    console.log('List');
+    // console.log(this.state);
+    console.log(this.props);
+    // TODO: replace mock data
+    var count = 0;
+    // create a list of bar links
+    var pubs = this.props.data.businesses.map((value, key, arr) => {
+      var item = (
+        <a href="#" className="list-group-item" key={key}>
+          <img className='image' src={value.image_url} />
+            <span className='badge' className="badge">Attending {count}</span>
+          <span className='title'> {value.name} </span>
+          <div className='description'> {value.snippet_text} </div>
+        </a>
+        )
+      return item;
+    });
+
+    return (
+      <div className="list-group">
+        {pubs}
+      </div>
+    )
+  }
+})
+
+const Btn = React.createClass({
+  render () {
+    // mock props
+    var count = 1;
+    return (
+      <a href="#">
+        <button className="btn btn-success btn-sm">{count} RSVP</button>
+      </a>
+    )
+  }
+})
 
 const Tweet = React.createClass({
   componentDidMount(){
@@ -124,6 +188,18 @@ const Tweet = React.createClass({
   },
   render(){
     return <a id='twit-share'></a>
+  }
+});
+
+const Header = React.createClass({
+  render(){
+    return (
+      <div className='header'>
+        <div id='image' ><img id='beer' src="/public/img/beer.png" /></div>
+        <h1>Looking for Somewhere to go tonight?</h1>
+        <h4>Search the bar scene and RSVP</h4>
+      </div>
+    )
   }
 });
 
