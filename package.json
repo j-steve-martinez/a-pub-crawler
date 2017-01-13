@@ -1,5 +1,5 @@
 {
-  "name": "pub-crawl",
+  "name": "pub-crawler",
   "version": "0.1.0",
   "description": "freeCodeCamp Dynamic Web Application Projects: Build a Nightlife Coordination App",
   "main": "server.js",

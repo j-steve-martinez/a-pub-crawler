@@ -48,8 +48,6 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -112,11 +110,11 @@
 	  _createClass(Main, [{
 	    key: 'callBack',
 	    value: function callBack(url, method, address) {
-	      console.log('Main callBack called');
-	      console.log('url ' + url);
-	      console.log('method ' + method);
-	      console.log('search: ');
-	      console.log(address);
+	      // console.log('Main callBack called');
+	      // console.log('url ' + url);
+	      // console.log('method ' + method);
+	      // console.log('search: ');
+	      // console.log(address);
 	      var appUrl = window.location.origin + url;
 	      var search = { address: address };
 	      var data = { url: appUrl, method: method, search: search };
@@ -127,8 +125,8 @@
 	    value: function getData(data) {
 	      var _this2 = this;
 
-	      console.log('getData data');
-	      console.log(data);
+	      // console.log('Main getData data');
+	      // console.log(data);
 	      var header = {};
 	      if (data.method === 'GET') {
 	        header.url = data.url;
@@ -141,19 +139,20 @@
 	        header.dataType = 'json';
 	      }
 	      $.ajax(header).then(function (results) {
-	        console.log('submitted done');
+	        // console.log('Main getData done');
 	        // console.log(results);
-	        console.log('start data');
-	        console.log(data.url);
+	        // console.log('Main getData(data)');
+	        // console.log(data.url);
 	        if (data.url.indexOf('rsvp') >= 0) {
 	          // var lastSearch = localStorage.getItem('lastSearch');
-	          console.log('url was /api/:id/rsvp');
-	          console.log('doing /api/search');
+	          localStorage.removeItem('rsvp');
+	          // console.log('url was /api/:id/rsvp');
+	          // console.log('doing /api/search');
 	          var lastSearch = localStorage.getItem('lastSearch');
 	          _this2.callBack('/api/search', 'POST', lastSearch);
 	        } else {
-	          console.log('get data setting state');
-	          console.log(data.url);
+	          // console.log('Main getData setting state');
+	          // console.log(data.url);
 	          // Put the results into storage
 	          localStorage.setItem('results', JSON.stringify(results));
 	          _this2.setState({ results: results, message: 'results' });
@@ -163,54 +162,63 @@
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      console.log('Main componentDidMount');
-	      console.log(this.state.auth);
+	      // console.log('Main componentDidMount');
+	      // console.log(this.state.auth);
 	    }
 	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      var _this3 = this;
 
-	      console.log('Main component WillMount');
+	      // console.log('Main component WillMount');
 	      var apiUrl = window.location.origin + '/api/:id';
 	      $.ajax({
 	        url: apiUrl,
 	        method: 'GET'
 	      }).then(function (auth) {
 	        // Retrieve the object from storage
-	        // var message, results, lastSearch, rsvp;
-	        // console.log('checking auth');
-	        // console.log(auth.id);
-	        // if (auth.id !== false) {
-	        // console.log('logged in');
-	        // message = 'ok';
-	        // results = JSON.parse(localStorage.getItem('results'));
-	        // lastSearch = localStorage.getItem('lastSearch');
-	        // pubId = localStorage.getItem('rsvp');
-	        // // do rsvp for last item clicked now that auth is ok
-	        // var rsvp = { uid = auth.id, pubID : pubId}
-	        // console.log('auth starting rsvp');
-	        // this.getData('/api/:id/rsvp', 'POST', rsvp);
-	        // // localStorage.removeItem('lastSearch');
-	        // // localStorage.removeItem('rsvp');
-	        // console.log('auth setting state');
-	        _this3.setState({ auth: auth });
+	        var message, results, lastSearch, rsvp;
+	        results = JSON.parse(localStorage.getItem('results'));
+	        if (auth.id === false) {
+	          message = '';
+	        } else {
+	          message = 'results';
+	        }
+	        // console.log('componentWillMount auth setting state');
+	        _this3.setState({ auth: auth, message: message, results: results });
 	        // }
 	      });
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      console.log('Main this.state');
-	      console.log(this.state);
-	      console.log('message');
-	      console.log(this.state.message);
+	      // console.log('Main render this.state');
+	      // console.log(this.state);
+	      // console.log('Main render message');
+	      // console.log(this.state.message);
+	      // console.log('Main render auth');
+	      // console.log(this.state.auth.id);
+	      // check for unhandled rsvp
+	      if (this.state.auth.id !== false) {
+	        var pubId = localStorage.getItem('rsvp');
+	        if (pubId !== null) {
+	          var data = { pubId: pubId, uid: this.state.auth.id };
+	          this.callBack('/api/:id/rsvp', 'POST', data);
+	        }
+	      }
 	      if (this.state.auth.id !== false && this.state.message === '') {
 	        var lastSearch = localStorage.getItem('lastSearch');
 	        this.callBack('/api/search', 'POST', lastSearch);
 	      }
 	      var results;
-	      this.state.message === '' ? results = null : results = React.createElement(List, { cb: this.callBack, data: this.state.results, auth: this.state.auth });
+	      if (this.state.auth.id === false && this.state.message === '') {
+	        // console.log('Main render results will be null');
+	        results = null;
+	      } else {
+	        // console.log('Main render results will be List');
+	        results = React.createElement(List, { cb: this.callBack, data: this.state.results, auth: this.state.auth });
+	      }
+
 	      return React.createElement(
 	        'div',
 	        null,
@@ -228,14 +236,14 @@
 	  displayName: 'Search',
 	  handler: function handler(e) {
 	    e.preventDefault();
-	    console.log('Search Handler');
-	    console.log(this.refs.input.value);
+	    // console.log('Search Handler');
+	    // console.log(this.refs.input.value);
 	    localStorage.setItem('lastSearch', this.refs.input.value);
 	    this.props.cb('/api/search', 'POST', this.refs.input.value);
 	  },
 	  render: function render() {
-	    console.log('Search');
-	    console.log(this.props);
+	    // console.log('Search render');
+	    // console.log(this.props);
 	    return React.createElement(
 	      'div',
 	      null,
@@ -281,8 +289,10 @@
 	var List = React.createClass({
 	  displayName: 'List',
 	  handler: function handler(e) {
-	    console.log('List Handler');
-	    console.log(this.props.data[e.target.id].id);
+	    // e.preventDefault();
+	    // console.log('List Handler');
+	    // console.log(e.target.id);
+	    // console.log(this.props.data[e.target.id].id);
 	    localStorage.setItem('rsvp', this.props.data[e.target.id].id);
 	    if (this.props.auth.id !== false) {
 	      e.preventDefault();
@@ -293,39 +303,52 @@
 	  render: function render() {
 	    var _this4 = this;
 
-	    console.log('List');
-	    console.log(this.props);
-	    // TODO: replace mock data
-	    // var count = 0;
-	    // create a list of bar links
-	    var pubs = this.props.data.map(function (value, key, arr) {
-	      var item = React.createElement(
-	        'a',
-	        { href: '/auth/twitter', id: key, onClick: _this4.handler, className: 'list-group-item', key: key },
-	        React.createElement('img', { id: key, className: 'image', src: value.image_url }),
-	        React.createElement(
-	          'span',
-	          _defineProperty({ id: key, className: 'badge' }, 'className', 'badge'),
-	          'Attending ',
-	          value.rsvp
-	        ),
-	        React.createElement(
-	          'span',
-	          { id: key, className: 'title' },
-	          ' ',
-	          value.name,
-	          ' '
-	        ),
-	        React.createElement(
+	    // console.log('List render');
+	    // console.log(this.props);
+	    // console.log(this.props.data.length);
+	    if (this.props.data.length !== undefined) {
+	      var pubs = this.props.data.map(function (value, key, arr) {
+	        var item = React.createElement(
 	          'div',
-	          { id: key, className: 'description' },
-	          ' ',
-	          value.snippet_text,
-	          ' '
-	        )
-	      );
-	      return item;
-	    });
+	          { className: 'list-group-item', key: key },
+	          React.createElement(
+	            'a',
+	            { href: '/auth/twitter', onClick: _this4.handler },
+	            React.createElement(
+	              'button',
+	              { id: key, className: 'btn btn-warning btn-xs attending' },
+	              'RSVP ',
+	              React.createElement(
+	                'span',
+	                { className: 'badge' },
+	                ' ',
+	                value.rsvp
+	              )
+	            )
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'imgContainer' },
+	            React.createElement('img', { className: 'img-rounded image', src: value.image_url })
+	          ),
+	          React.createElement(
+	            'a',
+	            { className: 'title', href: value.url, target: '_blank' },
+	            value.name
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'description' },
+	            ' ',
+	            value.snippet_text,
+	            ' '
+	          )
+	        );
+	        return item;
+	      });
+	    } else {
+	      var pubs = null;
+	    }
 
 	    return React.createElement(
 	      'div',

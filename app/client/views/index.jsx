@@ -46,19 +46,19 @@ class Main extends React.Component {
     this.state = {message : '', results: {}, auth : auth};
   }
   callBack(url, method, address){
-    console.log('Main callBack called');
-    console.log('url ' + url);
-    console.log('method ' + method);
-    console.log('search: ');
-    console.log(address);
+  // console.log('Main callBack called');
+  // console.log('url ' + url);
+  // console.log('method ' + method);
+  // console.log('search: ');
+  // console.log(address);
     var appUrl = window.location.origin + url;
     var search = { address : address};
     var data = {url : appUrl, method: method, search : search};
     this.getData(data);
   }
   getData(data){
-    console.log('getData data');
-    console.log(data);
+  // console.log('Main getData data');
+  // console.log(data);
     var header = {};
     if (data.method === 'GET') {
       header.url = data.url;
@@ -71,19 +71,20 @@ class Main extends React.Component {
       header.dataType = 'json';
     }
     $.ajax(header).then(results => {
-      console.log('submitted done');
+      // console.log('Main getData done');
       // console.log(results);
-      console.log('start data');
-      console.log(data.url);
+    // console.log('Main getData(data)');
+    // console.log(data.url);
       if (data.url.indexOf('rsvp') >= 0) {
         // var lastSearch = localStorage.getItem('lastSearch');
-        console.log('url was /api/:id/rsvp');
-        console.log('doing /api/search');
+        localStorage.removeItem('rsvp')
+      // console.log('url was /api/:id/rsvp');
+      // console.log('doing /api/search');
         var lastSearch = localStorage.getItem('lastSearch');
         this.callBack('/api/search', 'POST', lastSearch);
       } else {
-        console.log('get data setting state');
-        console.log(data.url);
+      // console.log('Main getData setting state');
+      // console.log(data.url);
         // Put the results into storage
         localStorage.setItem('results', JSON.stringify(results));
         this.setState({results : results, message : 'results'})
@@ -92,50 +93,57 @@ class Main extends React.Component {
     });
   }
   componentDidMount(){
-    console.log('Main componentDidMount');
-    console.log(this.state.auth);
+    // console.log('Main componentDidMount');
+    // console.log(this.state.auth);
   }
   componentWillMount(){
-    console.log('Main component WillMount');
+  // console.log('Main component WillMount');
     var apiUrl = window.location.origin + '/api/:id';
     $.ajax({
       url : apiUrl,
       method: 'GET'
     }).then(auth => {
       // Retrieve the object from storage
-      // var message, results, lastSearch, rsvp;
-      // console.log('checking auth');
-      // console.log(auth.id);
-      // if (auth.id !== false) {
-        // console.log('logged in');
-        // message = 'ok';
-        // results = JSON.parse(localStorage.getItem('results'));
-        // lastSearch = localStorage.getItem('lastSearch');
-        // pubId = localStorage.getItem('rsvp');
-        // // do rsvp for last item clicked now that auth is ok
-        // var rsvp = { uid = auth.id, pubID : pubId}
-        // console.log('auth starting rsvp');
-        // this.getData('/api/:id/rsvp', 'POST', rsvp);
-        // // localStorage.removeItem('lastSearch');
-        // // localStorage.removeItem('rsvp');
-        // console.log('auth setting state');
-        this.setState({auth})
+      var message, results, lastSearch, rsvp;
+      results = JSON.parse(localStorage.getItem('results'));
+      if (auth.id === false) {
+        message = '';
+      } else {
+        message = 'results'
+      }
+    // console.log('componentWillMount auth setting state');
+      this.setState({auth, message : message, results : results})
       // }
     })
   }
   render(){
-    console.log('Main this.state');
-    console.log(this.state);
-    console.log('message');
-    console.log(this.state.message);
+  // console.log('Main render this.state');
+  // console.log(this.state);
+    // console.log('Main render message');
+    // console.log(this.state.message);
+    // console.log('Main render auth');
+    // console.log(this.state.auth.id);
+    // check for unhandled rsvp
+    if (this.state.auth.id !== false) {
+      var pubId = localStorage.getItem('rsvp');
+      if (pubId !== null) {
+        var data = {pubId : pubId, uid : this.state.auth.id}
+        this.callBack('/api/:id/rsvp', 'POST', data);
+      }
+    }
     if (this.state.auth.id !== false && this.state.message === '') {
       var lastSearch = localStorage.getItem('lastSearch');
       this.callBack('/api/search', 'POST', lastSearch);
     }
     var results;
-    this.state.message === '' ?
-      results = null :
+    if (this.state.auth.id === false && this.state.message === '') {
+      // console.log('Main render results will be null');
+      results = null
+    } else {
+      // console.log('Main render results will be List');
       results = <List cb={this.callBack} data={this.state.results} auth={this.state.auth}/>;
+    }
+
     return(
       <div>
         <Header />
@@ -149,14 +157,14 @@ class Main extends React.Component {
 const Search = React.createClass({
   handler(e){
     e.preventDefault();
-    console.log('Search Handler');
-    console.log(this.refs.input.value);
+    // console.log('Search Handler');
+    // console.log(this.refs.input.value);
     localStorage.setItem('lastSearch', this.refs.input.value);
     this.props.cb('/api/search', 'POST', this.refs.input.value);
   },
   render(){
-    console.log('Search');
-    console.log(this.props);
+  // console.log('Search render');
+  // console.log(this.props);
     return (
       <div>
         <nav className="navbar navbar-default">
@@ -181,8 +189,10 @@ const Search = React.createClass({
 
 const List = React.createClass({
   handler(e){
-    console.log('List Handler');
-    console.log(this.props.data[e.target.id].id);
+    // e.preventDefault();
+    // console.log('List Handler');
+    // console.log(e.target.id);
+    // console.log(this.props.data[e.target.id].id);
     localStorage.setItem('rsvp', this.props.data[e.target.id].id);
     if (this.props.auth.id !== false) {
       e.preventDefault();
@@ -192,22 +202,26 @@ const List = React.createClass({
 
   },
   render(){
-    console.log('List');
-    console.log(this.props);
-    // TODO: replace mock data
-    // var count = 0;
-    // create a list of bar links
-    var pubs = this.props.data.map((value, key, arr) => {
-      var item = (
-        <a href='/auth/twitter' id={key} onClick={this.handler} className="list-group-item" key={key}>
-          <img id={key}  className='image' src={value.image_url} />
-            <span id={key}  className='badge' className="badge">Attending {value.rsvp}</span>
-          <span id={key} className='title'> {value.name} </span>
-          <div id={key} className='description'> {value.snippet_text} </div>
-        </a>
-        )
-      return item;
-    });
+  // console.log('List render');
+  // console.log(this.props);
+    // console.log(this.props.data.length);
+    if (this.props.data.length !== undefined) {
+      var pubs = this.props.data.map((value, key, arr) => {
+        var item = (
+          <div className="list-group-item" key={key}>
+            <a href="/auth/twitter" onClick={this.handler}>
+              <button id={key} className='btn btn-warning btn-xs attending'>RSVP <span className='badge'> {value.rsvp}</span></button>
+            </a>
+            <div className='imgContainer'><img className='img-rounded image' src={value.image_url} /></div>
+            <a className='title' href={value.url}  target='_blank'>{value.name}</a>
+            <div className='description'> {value.snippet_text} </div>
+          </div>
+          )
+        return item;
+      });
+    } else {
+      var pubs = null;
+    }
 
     return (
       <div className="list-group">

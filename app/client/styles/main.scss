@@ -22,27 +22,19 @@ footer {
   padding-bottom: 25px;
 }
 
-a.list-group-item {
+div.list-group-item {
   @include colors($colHighlight, $bgDefault);
   // @include colors($colHighlight, $bgHighlight);
 }
 
-a.list-group-item:hover{
+div.list-group-item:hover{
   @include colors($colHighlight, $bgHighlight);
 }
 
-a.list-group-item:focus {
+div.list-group-item::selection {
   @include colors($colDefault, $bgFocus);
 }
 
-.form-control {
-  @include colors($colHighlight, $bgFocus);
-  border-color: $bgFocus;
-}
-.form-control:focus {
-  border-color: #FF0000;
-  box-shadow: inset 0 1px 1px $colHighlight, 0 0 4px $colDefault;
-}
 #image {
   float:left;
 }
@@ -51,30 +43,39 @@ a.list-group-item:focus {
   width: 75px;
 }
 
-.badge {
-  @include colors(#f2f0bd, #427d50);
+#content {
+  min-width: 250px;
 }
 
-.button {
-  padding-left: 1px;
+.list-group-item {
+  height: auto;
+  margin-bottom: auto;
+  padding-bottom: 20px;
 }
-
-.image {
-  width: 50px;
-  padding-right: 3px;
+img {
+  width: 70px;
+}
+.imgContainer {
+  // display: inline;
+  float: left;
+  width: 80px;
+  // height: 80px;
+}
+.attending {
+  float: right;
 }
 
 .title {
-
-  padding-left: 5px;
-  padding-right: 5px;
+  // vertical-align: top;
+  // padding-left: 5px;
+  // padding-right: 5px;
 }
 
 .description {
-
+  float: none;
   padding-left: 5px;
   padding-right: 15px;
-  height:inherit;
+  // height:inherit;
 }
 
 .header {
