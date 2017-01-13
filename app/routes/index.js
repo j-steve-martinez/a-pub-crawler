@@ -19,7 +19,7 @@ module.exports = function (app, passport, configYelp) {
 	}
 
 	var clickHandler = new ClickHandler();
-	var yelpServer = new YelpServer();
+	// var yelpServer = new YelpServer();
 	clickHandler.addDefault();
 
 	app.route('/')
@@ -35,11 +35,12 @@ module.exports = function (app, passport, configYelp) {
 		});
 
 	app.route('/api/search')
-		.post(yelpServer.search)
-		// .get(yelpServer.search);
-		// .get(function(req, res){
-		// 	res.json({test : true});
-		// });
+		.post(clickHandler.search)
+
+	app.route('/api/rsvp')
+		.get((req, res)=>{
+			res.redirect('/auth/twitter')
+		});
 
 	// get user info
 	app.route('/api/:id')
@@ -58,6 +59,14 @@ module.exports = function (app, passport, configYelp) {
 
 	app.route('/auth/twitter')
 		.get(passport.authenticate('twitter'));
+		// .get((req, res)=>{
+		// 	if (req.isAuthenticated()) {
+		// 		res.json(req.user)
+		// 	} else {
+		// 		passport.authenticate('twitter')
+		// 	}
+		// });
+
 
 	app.route('/auth/twitter/callback')
 		.get(passport.authenticate('twitter', {
@@ -67,10 +76,10 @@ module.exports = function (app, passport, configYelp) {
 
 	// add, get, edit, delete the user poll data
 	// must be authenticated
-	// app.route('/api/:id/:poll')
-	// 	.get(isLoggedIn, clickHandler.getPolls)
-	// 	.put(isLoggedIn, clickHandler.editPoll)
-	// 	.post(isLoggedIn, clickHandler.addPoll)
-	// 	.delete(isLoggedIn, clickHandler.delPoll)
+	app.route('/api/:id/rsvp')
+		// .get(isLoggedIn, clickHandler.getPolls)
+		// .put(isLoggedIn, clickHandler.editPoll)
+		.post(isLoggedIn, clickHandler.rsvp)
+		// .delete(isLoggedIn, clickHandler.delPoll)
 
 };

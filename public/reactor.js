@@ -104,7 +104,8 @@
 
 	    _this.callBack = _this.callBack.bind(_this);
 	    _this.getData = _this.getData.bind(_this);
-	    _this.state = { message: '', results: {} };
+	    var auth = { id: false };
+	    _this.state = { message: '', results: {}, auth: auth };
 	    return _this;
 	  }
 
@@ -128,35 +129,73 @@
 
 	      console.log('getData data');
 	      console.log(data);
-	      $.ajax({
-	        url: data.url,
-	        method: data.method,
-	        data: JSON.stringify(data.search),
-	        contentType: "application/json",
-	        dataType: 'json'
-	      }).then(function (results) {
+	      var header = {};
+	      if (data.method === 'GET') {
+	        header.url = data.url;
+	        header.method = data.method;
+	      } else {
+	        header.url = data.url;
+	        header.method = data.method;
+	        header.data = JSON.stringify(data.search);
+	        header.contentType = "application/json";
+	        header.dataType = 'json';
+	      }
+	      $.ajax(header).then(function (results) {
 	        console.log('submitted done');
-	        console.log(results);
-	        _this2.setState({ results: results, message: 'results' });
+	        // console.log(results);
+	        console.log('start data');
+	        console.log(data.url);
+	        if (data.url.indexOf('rsvp') >= 0) {
+	          // var lastSearch = localStorage.getItem('lastSearch');
+	          console.log('url was /api/:id/rsvp');
+	          console.log('doing /api/search');
+	          var lastSearch = localStorage.getItem('lastSearch');
+	          _this2.callBack('/api/search', 'POST', lastSearch);
+	        } else {
+	          console.log('get data setting state');
+	          console.log(data.url);
+	          // Put the results into storage
+	          localStorage.setItem('results', JSON.stringify(results));
+	          _this2.setState({ results: results, message: 'results' });
+	        }
 	      });
 	    }
 	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      // console.log('Main componentDidMount');
+	      console.log('Main componentDidMount');
+	      console.log(this.state.auth);
 	    }
 	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      var _this3 = this;
 
-	      // console.log('Main componentWillMount');
+	      console.log('Main component WillMount');
 	      var apiUrl = window.location.origin + '/api/:id';
 	      $.ajax({
 	        url: apiUrl,
 	        method: 'GET'
 	      }).then(function (auth) {
+	        // Retrieve the object from storage
+	        // var message, results, lastSearch, rsvp;
+	        // console.log('checking auth');
+	        // console.log(auth.id);
+	        // if (auth.id !== false) {
+	        // console.log('logged in');
+	        // message = 'ok';
+	        // results = JSON.parse(localStorage.getItem('results'));
+	        // lastSearch = localStorage.getItem('lastSearch');
+	        // pubId = localStorage.getItem('rsvp');
+	        // // do rsvp for last item clicked now that auth is ok
+	        // var rsvp = { uid = auth.id, pubID : pubId}
+	        // console.log('auth starting rsvp');
+	        // this.getData('/api/:id/rsvp', 'POST', rsvp);
+	        // // localStorage.removeItem('lastSearch');
+	        // // localStorage.removeItem('rsvp');
+	        // console.log('auth setting state');
 	        _this3.setState({ auth: auth });
+	        // }
 	      });
 	    }
 	  }, {
@@ -166,8 +205,12 @@
 	      console.log(this.state);
 	      console.log('message');
 	      console.log(this.state.message);
+	      if (this.state.auth.id !== false && this.state.message === '') {
+	        var lastSearch = localStorage.getItem('lastSearch');
+	        this.callBack('/api/search', 'POST', lastSearch);
+	      }
 	      var results;
-	      this.state.message === '' ? results = null : results = React.createElement(List, { cb: this.callBack, data: this.state.results });
+	      this.state.message === '' ? results = null : results = React.createElement(List, { cb: this.callBack, data: this.state.results, auth: this.state.auth });
 	      return React.createElement(
 	        'div',
 	        null,
@@ -187,6 +230,7 @@
 	    e.preventDefault();
 	    console.log('Search Handler');
 	    console.log(this.refs.input.value);
+	    localStorage.setItem('lastSearch', this.refs.input.value);
 	    this.props.cb('/api/search', 'POST', this.refs.input.value);
 	  },
 	  render: function render() {
@@ -236,34 +280,45 @@
 
 	var List = React.createClass({
 	  displayName: 'List',
+	  handler: function handler(e) {
+	    console.log('List Handler');
+	    console.log(this.props.data[e.target.id].id);
+	    localStorage.setItem('rsvp', this.props.data[e.target.id].id);
+	    if (this.props.auth.id !== false) {
+	      e.preventDefault();
+	      var data = { uid: this.props.auth.id, pubId: this.props.data[e.target.id].id };
+	      this.props.cb('/api/:id/rsvp', 'POST', data);
+	    }
+	  },
 	  render: function render() {
+	    var _this4 = this;
+
 	    console.log('List');
-	    // console.log(this.state);
 	    console.log(this.props);
 	    // TODO: replace mock data
-	    var count = 0;
+	    // var count = 0;
 	    // create a list of bar links
-	    var pubs = this.props.data.businesses.map(function (value, key, arr) {
+	    var pubs = this.props.data.map(function (value, key, arr) {
 	      var item = React.createElement(
 	        'a',
-	        { href: '#', className: 'list-group-item', key: key },
-	        React.createElement('img', { className: 'image', src: value.image_url }),
+	        { href: '/auth/twitter', id: key, onClick: _this4.handler, className: 'list-group-item', key: key },
+	        React.createElement('img', { id: key, className: 'image', src: value.image_url }),
 	        React.createElement(
 	          'span',
-	          _defineProperty({ className: 'badge' }, 'className', 'badge'),
+	          _defineProperty({ id: key, className: 'badge' }, 'className', 'badge'),
 	          'Attending ',
-	          count
+	          value.rsvp
 	        ),
 	        React.createElement(
 	          'span',
-	          { className: 'title' },
+	          { id: key, className: 'title' },
 	          ' ',
 	          value.name,
 	          ' '
 	        ),
 	        React.createElement(
 	          'div',
-	          { className: 'description' },
+	          { id: key, className: 'description' },
 	          ' ',
 	          value.snippet_text,
 	          ' '

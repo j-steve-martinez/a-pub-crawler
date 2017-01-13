@@ -17,11 +17,11 @@ if (process.env.NODE_ENV === 'development') {
 	require('dotenv').load();
 }
 
-console.log('.env');
-console.log(process.env.YELP_KEY);
-console.log(process.env.YELP_SECRET);
-console.log(process.env.YELP_TOKEN);
-console.log(process.env.YELP_TOKEN_SECRET);
+// console.log('.env');
+// console.log(process.env.YELP_KEY);
+// console.log(process.env.YELP_SECRET);
+// console.log(process.env.YELP_TOKEN);
+// console.log(process.env.YELP_TOKEN_SECRET);
 
 require('./app/config/passport')(passport);
 
