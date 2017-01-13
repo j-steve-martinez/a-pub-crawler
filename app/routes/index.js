@@ -2,7 +2,6 @@
 
 var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
-var YelpServer = require(path + '/app/controllers/yelp.server.js');
 var index = path + '/public/index.html';
 
 module.exports = function (app, passport, configYelp) {
