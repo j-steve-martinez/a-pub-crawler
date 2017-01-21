@@ -7,7 +7,7 @@
   "createTargetDirectories":          false,
   "createTranspiledCode":             true,
   "disableWhenNoBabelrcFileInPath":   true,
-  "suppressSourcePathMessages":       false,
+  "suppressSourcePathMessages":       true,
   "suppressTranspileOnSaveMessages":  true,
   "transpileOnSave":                  true
 }

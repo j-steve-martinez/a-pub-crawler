@@ -9,7 +9,7 @@ module.exports = [
     entry: APP_DIR + '/client/views/index.jsx',
     output: {
         path: BUILD_DIR,
-        filename: 'reactor.js'
+        filename: 'bundle.js'
     },
     module: {
       loaders: [
