@@ -47,15 +47,6 @@ module.exports = function (app, passport, configYelp) {
 			res.json(req.user)
 		});
 
-	app.route('/auth/github')
-		.get(passport.authenticate('github'));
-
-	app.route('/auth/github/callback')
-		.get(passport.authenticate('github', {
-			successRedirect: '/',
-			failureRedirect: '/'
-		}));
-
 	app.route('/auth/twitter')
 		.get(passport.authenticate('twitter'));
 
@@ -69,6 +60,5 @@ module.exports = function (app, passport, configYelp) {
 	// must be authenticated
 	app.route('/api/:id/rsvp')
 		.post(isLoggedIn, clickHandler.rsvp)
-
 
 };
