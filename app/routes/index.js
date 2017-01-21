@@ -6,13 +6,13 @@ var index = path + '/public/index.html';
 
 module.exports = function (app, passport, configYelp) {
 	function isLoggedIn (req, res, next) {
-		console.log('starting isAuthenticated');
+		// console.log('starting isAuthenticated');
 		if (req.isAuthenticated()) {
-			console.log('isAuthenticated true');
+			// console.log('isAuthenticated true');
 			return next();
 		}	else {
-			console.log('isAuthenticated false');
-			console.log(req.url);
+			// console.log('isAuthenticated false');
+			// console.log(req.url);
 			res.json({id: false});
 		}
 	}
@@ -58,14 +58,6 @@ module.exports = function (app, passport, configYelp) {
 
 	app.route('/auth/twitter')
 		.get(passport.authenticate('twitter'));
-		// .get((req, res)=>{
-		// 	if (req.isAuthenticated()) {
-		// 		res.json(req.user)
-		// 	} else {
-		// 		passport.authenticate('twitter')
-		// 	}
-		// });
-
 
 	app.route('/auth/twitter/callback')
 		.get(passport.authenticate('twitter', {
@@ -73,12 +65,10 @@ module.exports = function (app, passport, configYelp) {
 			failureRedirect: '/'
 		}));
 
-	// add, get, edit, delete the user poll data
+	// rsvp
 	// must be authenticated
 	app.route('/api/:id/rsvp')
-		// .get(isLoggedIn, clickHandler.getPolls)
-		// .put(isLoggedIn, clickHandler.editPoll)
 		.post(isLoggedIn, clickHandler.rsvp)
-		// .delete(isLoggedIn, clickHandler.delPoll)
+
 
 };

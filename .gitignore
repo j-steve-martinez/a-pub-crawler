@@ -1,4 +1,6 @@
 node_modules/
 .eslintrc
 .env
+.babelrc
+.languagebabel
 public/css/main.js

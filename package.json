@@ -1,5 +1,5 @@
 {
-  "name": "pub-crawler",
+  "name": "a-pub-crawler",
   "version": "0.1.0",
   "description": "freeCodeCamp Dynamic Web Application Projects: Build a Nightlife Coordination App",
   "main": "server.js",
@@ -21,11 +21,9 @@
   ],
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:dev": "nodemon server.js",
+    "start:dev": "nodemon",
     "start:prod": "node server.js",
-    "dev:client": "webpack --config webpack.config.js -w",
-    "build:client": "webpack -p",
-    "build": "npm run build:client"
+    "build": "webpack -w"
   },
   "author": "J. Steve Martinez",
   "license": "MIT",
@@ -38,7 +36,6 @@
     "mongoose": "^4.1.0",
     "node-sass": "4.1.1",
     "passport": "^0.3.0",
-    "passport-github": "^1.0.0",
     "passport-twitter": "1.0.4",
     "react": "15.4.1",
     "react-bootstrap": "0.30.7",
