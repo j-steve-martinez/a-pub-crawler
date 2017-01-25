@@ -4,7 +4,6 @@ body {
   background-color: #f4f6c1; }
 
 footer {
-  text-align: center;
   padding-bottom: 25px; }
 
 div.list-group-item {
@@ -27,6 +26,9 @@ div.list-group-item::selection {
 
 #content {
   min-width: 250px; }
+
+#warning {
+  color: #f1140d; }
 
 .list-group-item {
   height: auto;

@@ -1,40 +1,6 @@
 'use strict'
 var React = require('react');
 var ReactDOM = require('react-dom');
-// var ReactBootstrap = require('react-bootstrap');
-// var Nav = ReactBootstrap.Nav;
-// var NavItem = ReactBootstrap.NavItem;
-// var NavDropdown = ReactBootstrap.NavDropdown;
-// var MenuItem = ReactBootstrap.MenuItem;
-
-function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
-    var vars = query.split('&');
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) == variable) {
-            return decodeURIComponent(pair[1]);
-        }
-    }
-    // console.log('Query variable %s not found', variable);
-}
-
-function getColors(num){
-  // console.log('getting colors');
-  var data = {c : [], bg : []};
-  var myColors = Please.make_color({
-    format: 'rgb',
-    colors_returned: num
-  });
-  myColors.forEach(item => {
-    var color = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '1)';
-    var bg = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '0.2)';
-    data.c.push(color);
-    data.bg.push(bg);
-  });
-  // console.log(data);
-  return data;
-}
 
 class Main extends React.Component {
   constructor(props) {
@@ -149,22 +115,35 @@ class Main extends React.Component {
         <Header />
         <Search cb={this.callBack}></Search>
         {results}
+        <Footer />
       </div>
     )
   }
 }
 
 const Search = React.createClass({
+  getInitialState(){
+    // console.log('Search getInitialState');
+    return {message : ''};
+  },
   handler(e){
     e.preventDefault();
     // console.log('Search Handler');
     // console.log(this.refs.input.value);
-    localStorage.setItem('lastSearch', this.refs.input.value);
-    this.props.cb('/api/search', 'POST', this.refs.input.value);
+    // check for a value or do a search
+    if (this.refs.input.value === '') {
+      var message = 'Please Enter an Address or City or Zip!';
+      this.setState({message : message});
+    } else {
+      localStorage.setItem('lastSearch', this.refs.input.value);
+      this.props.cb('/api/search', 'POST', this.refs.input.value);
+      this.setState({message : ''});
+    }
   },
   render(){
-  // console.log('Search render');
-  // console.log(this.props);
+    // console.log('Search render');
+    // console.log(this.state);
+    var alert = <div id='warning'>{this.state.message}</div> ;
     return (
       <div>
         <nav className="navbar navbar-default">
@@ -174,6 +153,7 @@ const Search = React.createClass({
                 <span>Pub Crawler</span>
               </div>
             </div>
+            {alert}
             <form id='search' className="navbar-form navbar-left" role="search">
               <div className="form-group">
                 <input type='text' ref='input' className="form-control" placeholder="Enter an Address"></input>
@@ -229,7 +209,7 @@ const List = React.createClass({
       </div>
     )
   }
-})
+});
 
 const Btn = React.createClass({
   render () {
@@ -241,7 +221,7 @@ const Btn = React.createClass({
       </a>
     )
   }
-})
+});
 
 const Tweet = React.createClass({
   componentDidMount(){
@@ -268,6 +248,31 @@ const Header = React.createClass({
         <h1>Looking for Somewhere to go tonight?</h1>
         <h4>Search the bar scene and RSVP</h4>
       </div>
+    )
+  }
+});
+
+const Footer = React.createClass({
+  render(){
+    return (
+      <footer>
+        <div>
+          <span className='fname'>Created By: </span>  
+          <a href="https://github.com/j-steve-martinez" target='_blank'>J. Steve Martinez</a>
+        </div>
+        <div>
+          <span className='fname'>Source: </span>
+          <a href="https://github.com/j-steve-martinez/a-pub-crawler" target='_blank'>GitHub</a>
+        </div>
+        <div>
+         <span className='fname'>Site: </span>
+          <a href="http://a-pub-crawler.herokuapp.com/" target='_blank'>Heroku</a>
+        </div>
+        <div>
+          <span> Powered by: </span>
+          <a href='https://www.yelp.com' target='_blank'>Yelp</a>
+        </div>
+      </footer>
     )
   }
 });

@@ -18,12 +18,10 @@ module.exports = function (app, passport, configYelp) {
 	}
 
 	var clickHandler = new ClickHandler();
-	// var yelpServer = new YelpServer();
 	clickHandler.addDefault();
 
 	app.route('/')
 		.get(function (req, res) {
-			// console.log(req.params);
 			res.sendFile(index);
 		});
 
@@ -49,7 +47,7 @@ module.exports = function (app, passport, configYelp) {
 
 	app.route('/auth/twitter')
 		.get(passport.authenticate('twitter'));
-// /auth/undefinedauth/twitter/callback
+
 	app.route('/auth/twitter/callback')
 		.get(passport.authenticate('twitter', {
 			successRedirect: '/',

@@ -5,9 +5,9 @@
   "babelTranspilePath":               "/public",
   "createMap":                        false,
   "createTargetDirectories":          false,
-  "createTranspiledCode":             true,
+  "createTranspiledCode":             false,
   "disableWhenNoBabelrcFileInPath":   true,
   "suppressSourcePathMessages":       true,
   "suppressTranspileOnSaveMessages":  true,
-  "transpileOnSave":                  true
+  "transpileOnSave":                  false
 }

@@ -56,40 +56,6 @@
 
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(32);
-	// var ReactBootstrap = require('react-bootstrap');
-	// var Nav = ReactBootstrap.Nav;
-	// var NavItem = ReactBootstrap.NavItem;
-	// var NavDropdown = ReactBootstrap.NavDropdown;
-	// var MenuItem = ReactBootstrap.MenuItem;
-
-	function getQueryVariable(variable) {
-	  var query = window.location.search.substring(1);
-	  var vars = query.split('&');
-	  for (var i = 0; i < vars.length; i++) {
-	    var pair = vars[i].split('=');
-	    if (decodeURIComponent(pair[0]) == variable) {
-	      return decodeURIComponent(pair[1]);
-	    }
-	  }
-	  // console.log('Query variable %s not found', variable);
-	}
-
-	function getColors(num) {
-	  // console.log('getting colors');
-	  var data = { c: [], bg: [] };
-	  var myColors = Please.make_color({
-	    format: 'rgb',
-	    colors_returned: num
-	  });
-	  myColors.forEach(function (item) {
-	    var color = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '1)';
-	    var bg = 'rgba(' + item.r + ', ' + item.g + ', ' + item.b + ', ' + '0.2)';
-	    data.c.push(color);
-	    data.bg.push(bg);
-	  });
-	  // console.log(data);
-	  return data;
-	}
 
 	var Main = function (_React$Component) {
 	  _inherits(Main, _React$Component);
@@ -224,7 +190,8 @@
 	        null,
 	        React.createElement(Header, null),
 	        React.createElement(Search, { cb: this.callBack }),
-	        results
+	        results,
+	        React.createElement(Footer, null)
 	      );
 	    }
 	  }]);
@@ -234,16 +201,32 @@
 
 	var Search = React.createClass({
 	  displayName: 'Search',
+	  getInitialState: function getInitialState() {
+	    // console.log('Search getInitialState');
+	    return { message: '' };
+	  },
 	  handler: function handler(e) {
 	    e.preventDefault();
 	    // console.log('Search Handler');
 	    // console.log(this.refs.input.value);
-	    localStorage.setItem('lastSearch', this.refs.input.value);
-	    this.props.cb('/api/search', 'POST', this.refs.input.value);
+	    // check for a value or do a search
+	    if (this.refs.input.value === '') {
+	      var message = 'Please Enter an Address or City or Zip!';
+	      this.setState({ message: message });
+	    } else {
+	      localStorage.setItem('lastSearch', this.refs.input.value);
+	      this.props.cb('/api/search', 'POST', this.refs.input.value);
+	      this.setState({ message: '' });
+	    }
 	  },
 	  render: function render() {
 	    // console.log('Search render');
-	    // console.log(this.props);
+	    // console.log(this.state);
+	    var alert = React.createElement(
+	      'div',
+	      { id: 'warning' },
+	      this.state.message
+	    );
 	    return React.createElement(
 	      'div',
 	      null,
@@ -266,6 +249,7 @@
 	              )
 	            )
 	          ),
+	          alert,
 	          React.createElement(
 	            'form',
 	            { id: 'search', className: 'navbar-form navbar-left', role: 'search' },
@@ -414,6 +398,72 @@
 	        'h4',
 	        null,
 	        'Search the bar scene and RSVP'
+	      )
+	    );
+	  }
+	});
+
+	var Footer = React.createClass({
+	  displayName: 'Footer',
+	  render: function render() {
+	    return React.createElement(
+	      'footer',
+	      null,
+	      React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'span',
+	          { className: 'fname' },
+	          'Created By: '
+	        ),
+	        React.createElement(
+	          'a',
+	          { href: 'https://github.com/j-steve-martinez', target: '_blank' },
+	          'J. Steve Martinez'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'span',
+	          { className: 'fname' },
+	          'Source: '
+	        ),
+	        React.createElement(
+	          'a',
+	          { href: 'https://github.com/j-steve-martinez/a-pub-crawler', target: '_blank' },
+	          'GitHub'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'span',
+	          { className: 'fname' },
+	          'Site: '
+	        ),
+	        React.createElement(
+	          'a',
+	          { href: 'http://a-pub-crawler.herokuapp.com/', target: '_blank' },
+	          'Heroku'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'span',
+	          null,
+	          ' Powered by: '
+	        ),
+	        React.createElement(
+	          'a',
+	          { href: 'https://www.yelp.com', target: '_blank' },
+	          'Yelp'
+	        )
 	      )
 	    );
 	  }
