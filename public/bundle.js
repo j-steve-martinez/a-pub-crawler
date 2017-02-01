@@ -126,12 +126,6 @@
 	      });
 	    }
 	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      // console.log('Main componentDidMount');
-	      // console.log(this.state.auth);
-	    }
-	  }, {
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
 	      var _this3 = this;
@@ -152,7 +146,6 @@
 	        }
 	        // console.log('componentWillMount auth setting state');
 	        _this3.setState({ auth: auth, message: message, results: results });
-	        // }
 	      });
 	    }
 	  }, {
@@ -164,7 +157,13 @@
 	      // console.log(this.state.message);
 	      // console.log('Main render auth');
 	      // console.log(this.state.auth.id);
-	      // check for unhandled rsvp
+
+	      /**
+	       * After logging into twitter
+	       * check that id is not false then get the
+	       * id of the rsvp from localstorage 
+	       * and update the remote database
+	       */
 	      if (this.state.auth.id !== false) {
 	        var pubId = localStorage.getItem('rsvp');
 	        if (pubId !== null) {
@@ -172,10 +171,19 @@
 	          this.callBack('/api/:id/rsvp', 'POST', data);
 	        }
 	      }
+	      /**
+	       * If logged in and no status message
+	       * get the last search from localStorage
+	       * and query yelp with last search address
+	       */
 	      if (this.state.auth.id !== false && this.state.message === '') {
 	        var lastSearch = localStorage.getItem('lastSearch');
 	        this.callBack('/api/search', 'POST', lastSearch);
 	      }
+	      /**
+	       * if not logged in don't show a list
+	       * else show the last query results
+	       */
 	      var results;
 	      if (this.state.auth.id === false && this.state.message === '') {
 	        // console.log('Main render results will be null');
@@ -209,7 +217,11 @@
 	    e.preventDefault();
 	    // console.log('Search Handler');
 	    // console.log(this.refs.input.value);
-	    // check for a value or do a search
+
+	    /**
+	     * if search value is empty give error message
+	     * else do a search
+	     */
 	    if (this.refs.input.value === '') {
 	      var message = 'Please Enter an Address or City or Zip!';
 	      this.setState({ message: message });
@@ -277,11 +289,29 @@
 	    // console.log('List Handler');
 	    // console.log(e.target.id);
 	    // console.log(this.props.data[e.target.id].id);
-	    localStorage.setItem('rsvp', this.props.data[e.target.id].id);
+	    var method,
+	        rsvp = 'rsvp-' + this.props.data[e.target.id].id;
+
+	    /**
+	     * If logged in check to see if rsvp value is stored
+	     *  if value then remove the value from localStorage
+	     *  if no value set the value to localstorage
+	     * and set the XMLHttpRequest method
+	     */
 	    if (this.props.auth.id !== false) {
 	      e.preventDefault();
+	      if (localStorage.getItem(rsvp)) {
+	        // console.log('removing localStorage' + rsvp);
+	        localStorage.removeItem(rsvp);
+	        method = 'PUT';
+	      } else {
+	        // console.log('setting localStorage' + rsvp);
+	        localStorage.setItem(rsvp, true);
+	        method = 'POST';
+	      }
+
 	      var data = { uid: this.props.auth.id, pubId: this.props.data[e.target.id].id };
-	      this.props.cb('/api/:id/rsvp', 'POST', data);
+	      this.props.cb('/api/:id/rsvp', method, data);
 	    }
 	  },
 	  render: function render() {
@@ -289,7 +319,11 @@
 
 	    // console.log('List render');
 	    // console.log(this.props);
-	    // console.log(this.props.data.length);
+
+	    /**
+	     * Render data if it exists
+	     * else set to null
+	     */
 	    if (this.props.data.length !== undefined) {
 	      var pubs = this.props.data.map(function (value, key, arr) {
 	        var item = React.createElement(
@@ -338,24 +372,6 @@
 	      'div',
 	      { className: 'list-group' },
 	      pubs
-	    );
-	  }
-	});
-
-	var Btn = React.createClass({
-	  displayName: 'Btn',
-	  render: function render() {
-	    // mock props
-	    var count = 1;
-	    return React.createElement(
-	      'a',
-	      { href: '#' },
-	      React.createElement(
-	        'button',
-	        { className: 'btn btn-success btn-sm' },
-	        count,
-	        ' RSVP'
-	      )
 	    );
 	  }
 	});

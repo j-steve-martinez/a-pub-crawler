@@ -74,14 +74,17 @@ function ClickHandler () {
 
 	this.rsvp = (req, res)=>{
 		// console.log('starting rsvp');
+		// wait for all data to be sent
 		req.on('data', function(body) {
 			var data = JSON.parse(body);
 			// console.log('rsvp data');
 			// console.log(data);
+			// check to see if there is a pub id with the user id
 			Pub.find({pubId : data.address.pubId, uid : data.address.uid}, (err, pub) => {
 				if (err) throw err;
 				// console.log('pub data');
 				// console.log(pub);
+				// if found end or add the pub and uid
 				if (pub.length) {
 					res.end();
 				} else {
@@ -89,12 +92,38 @@ function ClickHandler () {
 					// add the rsvp
 					var rsvp = new Pub();
 					rsvp.pubId 	= data.address.pubId;
-					rsvp.uid		= data.address.uid;
+					rsvp.uid	= data.address.uid;
 					rsvp.save((err, pub)=>{
 						if (err) throw err;
 						// console.log('rsvp saved: sending json');
 						res.json({isSaved : true, pub : pub});
 					});
+				}
+			});
+		});
+	}
+
+	this.wimpOut = (req, res)=>{
+		// console.log('starting rsvp');
+		// wait for all data to be sent
+		req.on('data', function(body) {
+			var data = JSON.parse(body);
+			// console.log('rsvp data');
+			// console.log(data);
+			// check to see if there is a pub id with the user id
+			Pub.find({pubId : data.address.pubId, uid : data.address.uid}, (err, pub) => {
+				if (err) throw err;
+				// console.log('pub data found');
+				// console.log(pub);
+				// if found remove
+				if (pub.length) {
+					// console.log('attempting to remove pub data');
+					Pub.remove({pubId : data.address.pubId, uid : data.address.uid}, (err, pub) => {
+						if (err) throw err;
+						// console.log('data removed');
+						// console.log(pub);
+						res.json({isRemoved : true, pub : pub})
+					})
 				}
 			});
 		});

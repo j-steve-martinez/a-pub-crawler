@@ -57,6 +57,7 @@ module.exports = function (app, passport, configYelp) {
 	// rsvp
 	// must be authenticated
 	app.route('/api/:id/rsvp')
-		.post(isLoggedIn, clickHandler.rsvp)
+		.put(isLoggedIn, clickHandler.wimpOut)
+		.post(isLoggedIn, clickHandler.rsvp)	
 
 };

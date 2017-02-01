@@ -3,4 +3,5 @@ node_modules/
 .env
 .babelrc
 .languagebabel
+.vscode/
 public/css/main.js

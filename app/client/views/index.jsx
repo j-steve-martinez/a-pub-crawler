@@ -12,19 +12,19 @@ class Main extends React.Component {
     this.state = {message : '', results: {}, auth : auth};
   }
   callBack(url, method, address){
-  // console.log('Main callBack called');
-  // console.log('url ' + url);
-  // console.log('method ' + method);
-  // console.log('search: ');
-  // console.log(address);
+    // console.log('Main callBack called');
+    // console.log('url ' + url);
+    // console.log('method ' + method);
+    // console.log('search: ');
+    // console.log(address);
     var appUrl = window.location.origin + url;
     var search = { address : address};
     var data = {url : appUrl, method: method, search : search};
     this.getData(data);
   }
   getData(data){
-  // console.log('Main getData data');
-  // console.log(data);
+    // console.log('Main getData data');
+    // console.log(data);
     var header = {};
     if (data.method === 'GET') {
       header.url = data.url;
@@ -39,18 +39,18 @@ class Main extends React.Component {
     $.ajax(header).then(results => {
       // console.log('Main getData done');
       // console.log(results);
-    // console.log('Main getData(data)');
-    // console.log(data.url);
+      // console.log('Main getData(data)');
+      // console.log(data.url);
       if (data.url.indexOf('rsvp') >= 0) {
         // var lastSearch = localStorage.getItem('lastSearch');
         localStorage.removeItem('rsvp')
-      // console.log('url was /api/:id/rsvp');
-      // console.log('doing /api/search');
+        // console.log('url was /api/:id/rsvp');
+        // console.log('doing /api/search');
         var lastSearch = localStorage.getItem('lastSearch');
         this.callBack('/api/search', 'POST', lastSearch);
       } else {
-      // console.log('Main getData setting state');
-      // console.log(data.url);
+        // console.log('Main getData setting state');
+        // console.log(data.url);
         // Put the results into storage
         localStorage.setItem('results', JSON.stringify(results));
         this.setState({results : results, message : 'results'})
@@ -58,12 +58,8 @@ class Main extends React.Component {
 
     });
   }
-  componentDidMount(){
-    // console.log('Main componentDidMount');
-    // console.log(this.state.auth);
-  }
   componentWillMount(){
-  // console.log('Main component WillMount');
+    // console.log('Main component WillMount');
     var apiUrl = window.location.origin + '/api/:id';
     $.ajax({
       url : apiUrl,
@@ -75,21 +71,26 @@ class Main extends React.Component {
       if (auth.id === false) {
         message = '';
       } else {
-        message = 'results'
+        message = 'results';
       }
-    // console.log('componentWillMount auth setting state');
-      this.setState({auth, message : message, results : results})
-      // }
+      // console.log('componentWillMount auth setting state');
+      this.setState({auth, message : message, results : results});
     })
   }
   render(){
-  // console.log('Main render this.state');
-  // console.log(this.state);
+    // console.log('Main render this.state');
+    // console.log(this.state);
     // console.log('Main render message');
     // console.log(this.state.message);
     // console.log('Main render auth');
     // console.log(this.state.auth.id);
-    // check for unhandled rsvp
+
+    /**
+     * After logging into twitter
+     * check that id is not false then get the
+     * id of the rsvp from localstorage 
+     * and update the remote database
+     */
     if (this.state.auth.id !== false) {
       var pubId = localStorage.getItem('rsvp');
       if (pubId !== null) {
@@ -97,14 +98,23 @@ class Main extends React.Component {
         this.callBack('/api/:id/rsvp', 'POST', data);
       }
     }
+    /**
+     * If logged in and no status message
+     * get the last search from localStorage
+     * and query yelp with last search address
+     */
     if (this.state.auth.id !== false && this.state.message === '') {
       var lastSearch = localStorage.getItem('lastSearch');
       this.callBack('/api/search', 'POST', lastSearch);
     }
+    /**
+     * if not logged in don't show a list
+     * else show the last query results
+     */
     var results;
     if (this.state.auth.id === false && this.state.message === '') {
       // console.log('Main render results will be null');
-      results = null
+      results = null;
     } else {
       // console.log('Main render results will be List');
       results = <List cb={this.callBack} data={this.state.results} auth={this.state.auth}/>;
@@ -130,7 +140,11 @@ const Search = React.createClass({
     e.preventDefault();
     // console.log('Search Handler');
     // console.log(this.refs.input.value);
-    // check for a value or do a search
+
+    /**
+     * if search value is empty give error message
+     * else do a search
+     */
     if (this.refs.input.value === '') {
       var message = 'Please Enter an Address or City or Zip!';
       this.setState({message : message});
@@ -173,18 +187,39 @@ const List = React.createClass({
     // console.log('List Handler');
     // console.log(e.target.id);
     // console.log(this.props.data[e.target.id].id);
-    localStorage.setItem('rsvp', this.props.data[e.target.id].id);
+    var method, rsvp = 'rsvp-' + this.props.data[e.target.id].id;
+
+    /**
+     * If logged in check to see if rsvp value is stored
+     *  if value then remove the value from localStorage
+     *  if no value set the value to localstorage
+     * and set the XMLHttpRequest method
+     */
     if (this.props.auth.id !== false) {
       e.preventDefault();
+      if (localStorage.getItem(rsvp)) {
+        // console.log('removing localStorage' + rsvp);
+        localStorage.removeItem(rsvp);
+        method = 'PUT';
+      } else {
+        // console.log('setting localStorage' + rsvp);
+        localStorage.setItem(rsvp, true);
+        method = 'POST';
+      }
+    
       var data = {uid: this.props.auth.id, pubId : this.props.data[e.target.id].id}
-      this.props.cb('/api/:id/rsvp', 'POST', data);
+      this.props.cb('/api/:id/rsvp', method, data);
     }
 
   },
   render(){
-  // console.log('List render');
-  // console.log(this.props);
-    // console.log(this.props.data.length);
+    // console.log('List render');
+    // console.log(this.props);
+
+    /**
+     * Render data if it exists
+     * else set to null
+     */
     if (this.props.data.length !== undefined) {
       var pubs = this.props.data.map((value, key, arr) => {
         var item = (
@@ -211,17 +246,6 @@ const List = React.createClass({
   }
 });
 
-const Btn = React.createClass({
-  render () {
-    // mock props
-    var count = 1;
-    return (
-      <a href="#">
-        <button className="btn btn-success btn-sm">{count} RSVP</button>
-      </a>
-    )
-  }
-});
 
 const Tweet = React.createClass({
   componentDidMount(){
